@@ -1,0 +1,45 @@
+#Bloqueo acceso al directorio includes
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^wpadmin/includes/ - [F.L]
+RewriteRule !^wp-includes/ - [S=3]
+RewriteRule ^wp-includes/[^/]+\.php$ - [F,L]
+RewriteRule ^wp-includes/js/tinymce/langs/.+\.php - [F,L]
+RewriteRule ^wp-includes/theme-compact/ - [F,L]
+</IfModule>
+
+#Bloqueo acceso a wp-config
+<Files wp-config.php>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+#Permitir que solo nuestra IP se loguee
+<IfModule mod_rewrite.c>
+RewriteEngine on 
+RewriteCond %{REQUEST_URI} ^(.*)?wp-login\.php(.*)$ [OR]
+RewriteCond %{REQUEST_URI} ^(.*)?wp-admin$
+RewriteCond %{REQUEST_ADDR} !^(nuestraip)$ 
+RewriteRule ^(.*)$ - [R=403,L]
+</IfModule>
+
+#Protección archivo htaccess
+<Files ˜ "^.*\.([Hh][Tt][Aa])">
+    Order Allow,Deny
+    Deny from all
+    Satisfy all
+</Files>
+
+#Cerrar acceso a directorios temas y plugins
+RewriteCond %{REQUEST_URI} !^/wp-content/plugins/file/to/exclude\.php
+RewriteCond %{REQUEST_URI} !^/wp-content/plugins/directory/to/exclude
+RewriteRule wp-content/plugins/(.*\.php)$ - [R=404,L]
+RewriteCond %{REQUEST_URI} !^/wp-content/themes/file/to/exclude\.php
+RewriteCond %{REQUEST_URI} !^/wp-content/themes/directory/to/exclude/
+RewriteRule wp-content/plugins/(.*\.php)$ - [R=404,L]
+
+#No permitir ver los directorios
+Options -Indexes
+
+
